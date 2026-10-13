@@ -77,6 +77,8 @@ public class PlayerAttack : MonoBehaviour
         if (currentTarget.AddLove(amount, transform))
         {
             info.AddCaptive();
+            if (ScoreManager.Instance != null)
+                ScoreManager.Instance.AddScore(currentTarget.Info.Score); // 일반 3점 / 특별 10점
             currentTarget = null;
         }
     }

@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 
 /// <summary>
-/// 플레이어 데이터 (이동/공격 수치, 포로 수, 최고 점수).
+/// 플레이어 데이터 (이동/공격 수치, 포로 수). 점수는 ScoreManager가 관리.
 /// PlayerController, PlayerAttack이 이 값을 참조함.
 /// </summary>
 public class PlayerInfo : MonoBehaviour
@@ -21,8 +21,6 @@ public class PlayerInfo : MonoBehaviour
     [SerializeField] private float attackRange = 3f;
     [SerializeField] private LayerMask targetLayer = ~0;
 
-    private const string BestScoreKey = "BestScore";
-
     public float WalkSpeed => walkSpeed;
     public float RunSpeed => walkSpeed + runBonusSpeed;
     public float WalkDistance => walkDistance;
@@ -30,11 +28,10 @@ public class PlayerInfo : MonoBehaviour
     public float AttackRange => attackRange;
     public LayerMask TargetLayer => targetLayer;
 
-    /// <summary>현재 포로 수 (= 현재 점수)</summary>
+    /// <summary>현재 판에서 잡은 포로 수</summary>
     public int Captives { get; private set; }
-    public int BestScore => PlayerPrefs.GetInt(BestScoreKey, 0);
 
-    /// <summary>false면 입력/이동/공격 모두 정지 (타이머 종료 시 GameManager에서 설정)</summary>
+    /// <summary>false면 입력/이동/공격 모두 정지 (UIManager가 게임 시작/종료 시 설정)</summary>
     public bool IsPlaying { get; private set; } = true;
 
     public event Action<int> OnCaptiveChanged;
@@ -56,13 +53,10 @@ public class PlayerInfo : MonoBehaviour
         IsPlaying = playing;
     }
 
-    /// <summary>현재 점수가 최고 점수보다 높으면 저장 후 true</summary>
-    public bool TrySaveBestScore()
+    public void ResetCaptives()
     {
-        if (Captives <= BestScore) return false;
-        PlayerPrefs.SetInt(BestScoreKey, Captives);
-        PlayerPrefs.Save();
-        return true;
+        Captives = 0;
+        OnCaptiveChanged?.Invoke(Captives);
     }
 
     private void OnDrawGizmosSelected()

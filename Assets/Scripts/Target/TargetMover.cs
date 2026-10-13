@@ -8,6 +8,10 @@ public enum TargetState
     Charming, // 플레이어가 누르고 있는 중 (멈춰 서서 LovePercent 상승)
     Love      // 포로가 됨
 }
+
+/// <summary>
+/// TargetInfoSO 기반 타겟 이동 + LovePercent 관리.
+/// </summary>
 [RequireComponent(typeof(Collider2D))]
 public class TargetMover : MonoBehaviour
 {
@@ -21,6 +25,7 @@ public class TargetMover : MonoBehaviour
     public float LovePercent { get; private set; }
     public bool IsLoved => State == TargetState.Love;
 
+    /// <summary>Love 상태가 되는 순간 호출</summary>
     public event Action<TargetMover> OnLoved;
 
     private Vector2 originPos;
@@ -42,6 +47,7 @@ public class TargetMover : MonoBehaviour
         }
         RefreshSlider();
     }
+
     private void Start()
     {
         PickNewDestination();
@@ -73,6 +79,19 @@ public class TargetMover : MonoBehaviour
             PickNewDestination();
         }
         charmedThisFrame = false;
+    }
+
+    /// <summary>새 게임 시작 시 호출: 처음 위치로 돌아가고 LovePercent 0, 배회 상태로 초기화</summary>
+    public void ResetTarget()
+    {
+        State = TargetState.Wander;
+        LovePercent = 0f;
+        followTarget = null;
+        charmedThisFrame = false;
+        waitTimer = 0f;
+        transform.position = new Vector3(originPos.x, originPos.y, transform.position.z);
+        RefreshSlider();
+        PickNewDestination();
     }
 
     #region LovePercent
@@ -141,6 +160,21 @@ public class TargetMover : MonoBehaviour
         destination = originPos + new Vector2(
             UnityEngine.Random.Range(-info.moveRange.x, info.moveRange.x),
             UnityEngine.Random.Range(-info.moveRange.y, info.moveRange.y));
+
+        if (info.clampToCameraView) destination = ClampToCamera(destination);
+    }
+
+    private Vector2 ClampToCamera(Vector2 pos)
+    {
+        Camera cam = Camera.main;
+        if (cam == null || !cam.orthographic) return pos;
+
+        float halfH = cam.orthographicSize - info.screenPadding;
+        float halfW = cam.orthographicSize * cam.aspect - info.screenPadding;
+        Vector2 c = cam.transform.position;
+        return new Vector2(
+            Mathf.Clamp(pos.x, c.x - halfW, c.x + halfW),
+            Mathf.Clamp(pos.y, c.y - halfH, c.y + halfH));
     }
 
     private void FollowPlayer()
