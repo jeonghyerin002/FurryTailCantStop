@@ -4,8 +4,9 @@ using UnityEngine.InputSystem;
 
 /// <summary>
 /// PlayerInfo 기반 탭 이동.
-/// 탭한 지점까지의 거리가 5 이하면 걷기(5), 초과면 달리기(5+2).
+/// 탭한 지점까지의 거리가 5 이하면 걷기(5), 초과면 달리기(5+2). 피버 중엔 속도 x2.
 /// 타겟을 탭한 경우는 PlayerAttack이 처리하므로 이동하지 않음.
+/// 스턴 중 / 연타 대결 중에는 이동하지 않음.
 /// </summary>
 [RequireComponent(typeof(PlayerInfo))]
 public class PlayerController : MonoBehaviour
@@ -15,12 +16,17 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float arriveThreshold = 0.05f;
     [Tooltip("타겟 판정 여유 반경 (손가락으로 정확히 누르기 어려운 것 보정)")]
     [SerializeField] private float tapRadius = 0.3f;
+    [Tooltip("이동 목적지를 카메라 화면 안으로 제한")]
+    [SerializeField] private bool clampToCamera = true;
+    [SerializeField] private float screenPadding = 0.3f;
     [Tooltip("탭 판정 결과(타겟/빈 곳)를 Console에 출력")]
     [SerializeField] private bool debugLog = true;
 
     private PlayerInfo info;
     private PlayerAttack attack;
+    private StunController stun;
     private Vector3 expectedPos;
+    private Vector3 startPos;
     private float lastWarnTime = -10f;
     private Vector2 destination;
     private float currentSpeed;
@@ -28,22 +34,27 @@ public class PlayerController : MonoBehaviour
 
     public bool IsMoving => isMoving;
     public bool IsRunning => isMoving && currentSpeed > info.WalkSpeed;
+    /// <summary>피버 배율까지 적용된 실제 이동 속도</summary>
+    public float CurrentSpeed => isMoving ? currentSpeed * FeverManager.MoveMultiplier : 0f;
 
     private void Awake()
     {
         info = GetComponent<PlayerInfo>();
         attack = GetComponent<PlayerAttack>();
+        stun = GetComponent<StunController>();
         if (cam == null) cam = Camera.main;
         if (spriteRenderer == null) spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+        startPos = transform.position;
         destination = transform.position;
         expectedPos = transform.position;
     }
 
     private void Update()
     {
-        if (!info.IsPlaying)
+        if (!info.IsPlaying || (stun != null && stun.IsBusy) || DuelManager.BlocksInput)
         {
             isMoving = false;
+            expectedPos = transform.position;
             return;
         }
 
@@ -58,6 +69,13 @@ public class PlayerController : MonoBehaviour
 
     private void LateUpdate()
     {
+        // 넉백(StunController)으로 움직인 건 정상
+        if (stun != null && (stun.IsBusy || stun.LastMoveFrame == Time.frameCount))
+        {
+            expectedPos = transform.position;
+            return;
+        }
+
         // 이 스크립트 말고 다른 무언가가 플레이어를 움직이는지 감지
         if (debugLog && (transform.position - expectedPos).sqrMagnitude > 0.000001f && Time.time - lastWarnTime > 1f)
         {
@@ -91,6 +109,7 @@ public class PlayerController : MonoBehaviour
     /// <summary>목적지 설정 + 거리에 따라 속도 결정</summary>
     public void MoveTo(Vector2 targetPos)
     {
+        if (clampToCamera) targetPos = CameraBounds.Clamp(targetPos, screenPadding);
         destination = targetPos;
         float distance = Vector2.Distance(transform.position, targetPos);
         currentSpeed = info.GetMoveSpeed(distance);
@@ -114,12 +133,22 @@ public class PlayerController : MonoBehaviour
         destination = transform.position;
     }
 
+    /// <summary>새 게임 시작 시 처음 위치로</summary>
+    public void ResetToStart()
+    {
+        Stop();
+        transform.position = startPos;
+        destination = startPos;
+        expectedPos = startPos;
+    }
+
     private void Move()
     {
         if (!isMoving) return;
 
+        float speed = currentSpeed * FeverManager.MoveMultiplier; // 피버: 이동 속도 2배
         Vector2 current = transform.position;
-        Vector2 next = Vector2.MoveTowards(current, destination, currentSpeed * Time.deltaTime);
+        Vector2 next = Vector2.MoveTowards(current, destination, speed * Time.deltaTime);
         transform.position = new Vector3(next.x, next.y, transform.position.z);
 
         if (spriteRenderer != null && Mathf.Abs(destination.x - current.x) > 0.01f)
@@ -136,7 +165,7 @@ public class PlayerController : MonoBehaviour
     }
 
     /// <summary>
-    /// 화면 좌표에 아직 Love 상태가 아닌 타겟이 있는지 검사.
+    /// 화면 좌표에 눈빛을 쏠 수 있는 타겟(Wander/Charming)이 있는지 검사.
     /// 레이어와 상관없이 모든 콜라이더를 검사하고 TargetMover가 있는 것만 타겟으로 인정.
     /// (콜라이더가 자식에 있어도 부모의 TargetMover를 찾음, 2D/3D 콜라이더 모두 지원)
     /// </summary>
@@ -149,8 +178,7 @@ public class PlayerController : MonoBehaviour
         foreach (Collider2D hit in hits2D)
         {
             target = hit.GetComponentInParent<TargetMover>();
-            if (target != null && !target.IsLoved)
-            if (target != null && !target.IsLoved)
+            if (target != null && target.IsAvailable)
             {
                 if (debugLog && logResult) Debug.Log($"[Tap] 타겟 클릭: {target.name}");
                 return true;
@@ -162,7 +190,7 @@ public class PlayerController : MonoBehaviour
         foreach (RaycastHit hit in hits3D)
         {
             target = hit.collider.GetComponentInParent<TargetMover>();
-            if (target != null && !target.IsLoved)
+            if (target != null && target.IsAvailable)
             {
                 if (debugLog && logResult) Debug.Log($"[Tap] 타겟 클릭: {target.name}");
                 return true;

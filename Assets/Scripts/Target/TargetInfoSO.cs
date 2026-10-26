@@ -2,12 +2,13 @@ using UnityEngine;
 
 public enum TargetType
 {
-    Normal,  // 일반 타겟 : 3점
-    Special  // 특별 타겟 : 10점
+    Normal,  // 일반 타겟 (강아지 퍼리) : 3점
+    Special  // 미남 타겟 (늑대 퍼리) : 10점
 }
 
 /// <summary>
 /// 타겟의 기본 데이터. (Project 창 > Create > EyeContact > Target Info)
+/// 기획서: 강아지 3종 = Normal SO 3개 / 늑대 = Special SO 1개
 /// </summary>
 [CreateAssetMenu(fileName = "TargetInfo", menuName = "EyeContact/Target Info")]
 public class TargetInfoSO : ScriptableObject
@@ -48,4 +49,14 @@ public class TargetInfoSO : ScriptableObject
     public bool followPlayerOnLove = false;
     public float followDistance = 1.2f;
     public float followSpeed = 4f;
+
+    [Header("라이벌 (여우 영애)")]
+    [Tooltip("라이벌이 이 타겟을 뺏는 데 걸리는 시간 배율. 1 = RivalInfo의 stealTime 그대로")]
+    [Min(0.1f)] public float rivalResistance = 1f;
+    [Tooltip("라이벌에게 뺏긴 뒤 라이벌을 따라다니는 시간(초). 끝나면 처음 위치에서 다시 등장")]
+    [Min(0f)] public float takenDuration = 6f;
+
+    [Header("리스폰 (5분 동안 타겟이 고갈되지 않도록)")]
+    [Tooltip("Love 상태가 된 뒤 이 시간(초)이 지나면 처음 위치에서 다시 등장. 0이면 리스폰 안 함")]
+    [Min(0f)] public float respawnDelay = 12f;
 }

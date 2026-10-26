@@ -810,62 +810,6 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 10
   m_TargetDisplay: 0
---- !u!1 &541650138
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 541650140}
-  - component: {fileID: 541650139}
-  m_Layer: 0
-  m_Name: UIManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &541650139
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 541650138}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ab94f06b46e83dc49b8774b5101af4fd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UIManager
-  player: {fileID: 1498299029}
-  startPanel: {fileID: 2036605323}
-  currentScoreText: {fileID: 1981583135}
-  bestScoreText: {fileID: 1663104763}
-  startButton: {fileID: 1153125772}
-  inGameUIRoot: {fileID: 0}
-  timerText: {fileID: 846897605}
-  inGameScoreText: {fileID: 1426066481}
-  gameDuration: 30
-  currentScoreFormat: 'Score : {0}'
-  bestScoreFormat: 'Best : {0}'
-  inGameScoreFormat: '{0}'
---- !u!4 &541650140
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 541650138}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -5.85795, y: 2.08901, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &552229009
 GameObject:
   m_ObjectHideFlags: 0
@@ -988,6 +932,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TargetMover
   info: {fileID: 11400000, guid: 4017bb4fc7f02c94ab4afee107a611d6, type: 2}
   lovePercentSlider: {fileID: 162283634}
+  rivalLoveSlider: {fileID: 0}
   spriteRenderer: {fileID: 576548540}
 --- !u!61 &576548539
 BoxCollider2D:
@@ -1460,6 +1405,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TargetMover
   info: {fileID: 11400000, guid: 4017bb4fc7f02c94ab4afee107a611d6, type: 2}
   lovePercentSlider: {fileID: 552229010}
+  rivalLoveSlider: {fileID: 0}
   spriteRenderer: {fileID: 710449268}
 --- !u!61 &710449267
 BoxCollider2D:
@@ -1580,50 +1526,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1928007915}
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &842984361
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 842984363}
-  - component: {fileID: 842984362}
-  m_Layer: 0
-  m_Name: ScoreManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &842984362
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 842984361}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1cea1057c16766b429f450ae295b5259, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ScoreManager
---- !u!4 &842984363
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 842984361}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -5.85795, y: 2.08901, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &846897603
@@ -1992,6 +1894,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TargetMover
   info: {fileID: 11400000, guid: 4017bb4fc7f02c94ab4afee107a611d6, type: 2}
   lovePercentSlider: {fileID: 595192385}
+  rivalLoveSlider: {fileID: 0}
   spriteRenderer: {fileID: 1107629453}
 --- !u!61 &1107629452
 BoxCollider2D:
@@ -2507,6 +2410,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TargetMover
   info: {fileID: 11400000, guid: 4017bb4fc7f02c94ab4afee107a611d6, type: 2}
   lovePercentSlider: {fileID: 1203827414}
+  rivalLoveSlider: {fileID: 0}
   spriteRenderer: {fileID: 1241541763}
 --- !u!61 &1241541766
 BoxCollider2D:
@@ -2800,6 +2704,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerAttack
   cancelWhenPointerLeaves: 1
+  beam: {fileID: 0}
 --- !u!114 &1498299028
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2816,6 +2721,8 @@ MonoBehaviour:
   spriteRenderer: {fileID: 1498299025}
   arriveThreshold: 0.05
   tapRadius: 0.3
+  clampToCamera: 1
+  screenPadding: 0.3
   debugLog: 1
 --- !u!114 &1498299029
 MonoBehaviour:
@@ -3512,6 +3419,134 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 10
   m_TargetDisplay: 0
+--- !u!1 &1933698364
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1933698369}
+  - component: {fileID: 1933698368}
+  - component: {fileID: 1933698367}
+  - component: {fileID: 1933698366}
+  - component: {fileID: 1933698365}
+  m_Layer: 0
+  m_Name: GameManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1933698365
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1933698364}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b812c72e1db6b83448610b2719ce63d3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DuelManager
+  duelDuration: 4
+  introDelay: 0.6
+  startGauge: 0.5
+  playerPushPerTap: 0.05
+  rivalPushPerTap: 0.05
+  postDuelInputBlock: 0.35
+  rivalKnockbackDistance: 3
+  rivalFaintDuration: 3
+  playerKnockbackDistance: 2.5
+  playerStunDuration: 2
+  knockbackTime: 0.35
+--- !u!114 &1933698366
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1933698364}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42cadd2a3c3c67e40a489849a12a6ba9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FeverManager
+  maxGauge: 100
+  normalGain: 20
+  specialGain: 50
+  feverDuration: 10
+  moveSpeedMultiplier: 2
+  charmSpeedMultiplier: 3
+--- !u!114 &1933698367
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1933698364}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab94f06b46e83dc49b8774b5101af4fd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UIManager
+  player: {fileID: 0}
+  startPanel: {fileID: 0}
+  currentScoreText: {fileID: 0}
+  bestScoreText: {fileID: 0}
+  gradeText: {fileID: 0}
+  newBestBadge: {fileID: 0}
+  startButton: {fileID: 0}
+  inGameUIRoot: {fileID: 0}
+  timerText: {fileID: 0}
+  inGameScoreText: {fileID: 0}
+  captiveText: {fileID: 0}
+  gameDuration: 300
+  gradeRules:
+  - grade: S
+    minScore: 200
+  - grade: A
+    minScore: 140
+  - grade: B
+    minScore: 90
+  - grade: C
+    minScore: 45
+  - grade: D
+    minScore: 0
+  currentScoreFormat: 'Score : {0}'
+  bestScoreFormat: 'Best : {0}'
+  gradeFormat: 'Rank : {0}'
+  inGameScoreFormat: '{0}'
+  captiveFormat: x {0}
+--- !u!114 &1933698368
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1933698364}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1cea1057c16766b429f450ae295b5259, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ScoreManager
+--- !u!4 &1933698369
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1933698364}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1956398423
 GameObject:
   m_ObjectHideFlags: 0
@@ -3849,6 +3884,5 @@ SceneRoots:
   - {fileID: 710449269}
   - {fileID: 881420105}
   - {fileID: 694511179}
-  - {fileID: 842984363}
-  - {fileID: 541650140}
   - {fileID: 1102596184}
+  - {fileID: 1933698369}
