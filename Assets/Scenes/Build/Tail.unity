@@ -4252,7 +4252,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 0, y: -100}
+  m_AnchoredPosition: {x: 0, y: -150}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &846897605
@@ -6742,7 +6742,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 0, y: -50}
+  m_AnchoredPosition: {x: 0, y: -100}
   m_SizeDelta: {x: 180, y: 25}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1203827416
@@ -8066,7 +8066,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 0, y: -150}
+  m_AnchoredPosition: {x: 0, y: -200}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1426066481
@@ -11628,8 +11628,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DuelManager
   duelDuration: 4
   introDelay: 0.6
-  playerPushPerTap: 0.08
-  rivalPushPerTap: 0.03
+  playerPushPerTap: 0.05
+  rivalPushPerTap: 0.035
   postDuelInputBlock: 0.35
   joinRange: 4
   allowJoinDuringDuel: 1
@@ -11707,7 +11707,7 @@ MonoBehaviour:
   timerText: {fileID: 846897605}
   inGameScoreText: {fileID: 1426066481}
   captiveText: {fileID: 0}
-  gameDuration: 120
+  gameDuration: 90
   gradeRules:
   - grade: S
     minScore: 200
