@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 19e247e399cdbc54baa08a24f94bebf5, type: 3}
+  m_Name: RivalInfo
+  m_EditorClassIdentifier: Assembly-CSharp::RivalInfoSO
+  moveSpeed: 2
+  approachSpeed: 3.2
+  wanderRange: {x: 4, y: 3}
+  waitTimeRange: {x: 0.5, y: 2}
+  arriveThreshold: 0.05
+  clampToCameraView: 1
+  screenPadding: 0.5
+  guardRadius: 1.8
+  attackOnlyAfterPlayer: 1
+  detectRange: 6
+  canHuntSpecial: 0
+  huntCooldownRange: {x: 4, y: 8}
+  giveUpTime: 6
+  interveneRange: 4
+  charmRange: 2.5
+  stealTime: 6
+  tapsPerSecond: 6
+  tapJitter: 0.35
+  leaveSpeed: 1.6
+  leaveMargin: 1.5
+  leaveTimeout: 12
+  recoverCooldown: 2

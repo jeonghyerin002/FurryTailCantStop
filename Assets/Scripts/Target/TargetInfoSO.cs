@@ -44,19 +44,11 @@ public class TargetInfoSO : ScriptableObject
     [Tooltip("누르기를 멈췄을 때 초당 감소량(%). 0이면 감소하지 않음")]
     [Min(0f)] public float loveDecayPerSecond = 20f;
 
-    [Header("Love 상태 (포로)")]
-    [Tooltip("Love 상태가 되면 플레이어를 따라다님 (끄면 그 자리에 멈춤)")]
-    public bool followPlayerOnLove = false;
-    public float followDistance = 1.2f;
+    [Header("따라다니기")]
+    [Tooltip("유혹된 뒤 플레이어 꼬리 줄을 따라가는 기본 속도 (멀어지면 TailChain이 더 빠르게 따라잡게 함)")]
     public float followSpeed = 4f;
 
     [Header("라이벌 (여우 영애)")]
     [Tooltip("라이벌이 이 타겟을 뺏는 데 걸리는 시간 배율. 1 = RivalInfo의 stealTime 그대로")]
     [Min(0.1f)] public float rivalResistance = 1f;
-    [Tooltip("라이벌에게 뺏긴 뒤 라이벌을 따라다니는 시간(초). 끝나면 처음 위치에서 다시 등장")]
-    [Min(0f)] public float takenDuration = 6f;
-
-    [Header("리스폰 (5분 동안 타겟이 고갈되지 않도록)")]
-    [Tooltip("Love 상태가 된 뒤 이 시간(초)이 지나면 처음 위치에서 다시 등장. 0이면 리스폰 안 함")]
-    [Min(0f)] public float respawnDelay = 12f;
 }

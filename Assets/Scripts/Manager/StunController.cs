@@ -64,6 +64,18 @@ public class StunController : MonoBehaviour
         if (!wasBusy) OnStunStarted?.Invoke(this);
     }
 
+    /// <summary>튕겨 나가지 않고 그 자리에서 duration초 동안 멈춤</summary>
+    public void Stun(float duration)
+    {
+        bool wasBusy = IsBusy;
+        IsKnockedBack = false;
+        IsStunned = duration > 0f;
+        stunTimer = duration;
+        blinkTimer = 0f;
+        if (stunEffect != null) stunEffect.SetActive(IsStunned);
+        if (!wasBusy && IsStunned) OnStunStarted?.Invoke(this);
+    }
+
     private void Update()
     {
         if (IsKnockedBack)

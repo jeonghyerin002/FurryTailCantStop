@@ -12,7 +12,9 @@ public enum RivalState
     Approach, // 타겟에게 접근
     Charming, // 타겟에게 눈빛 발사 (뺏는 중)
     Dueling,  // 플레이어와 연타 대결
-    Stunned   // 튕겨 나가 기절
+    Stunned,  // 튕겨 나가 기절
+    Leaving,  // 뺏은 타겟을 데리고 화면 밖으로 퇴장 중
+    Gone      // 퇴장 완료 (새 게임 전까지 사라짐)
 }
 
 /// <summary>
@@ -30,6 +32,9 @@ public class RivalAI : MonoBehaviour
     [Tooltip("자식(눈 위치)에 있는 EyeBeam. 비워두면 자식에서 자동 탐색")]
     [SerializeField] private EyeBeam beam;
     [SerializeField] private SpriteRenderer spriteRenderer;
+    [Tooltip("퇴장할 때 걸음마다 통통 튀는 높이 (스프라이트가 자식 오브젝트일 때만)")]
+    [SerializeField] private float walkBobHeight = 0.08f;
+    [SerializeField] private float walkBobSpeed = 9f;
 
     public RivalInfoSO Info => info;
     public RivalMode Mode => mode;
@@ -39,6 +44,11 @@ public class RivalAI : MonoBehaviour
 
     /// <summary>지금 이 타겟에 눈빛을 쏘고 있는지 (대결 시작 조건)</summary>
     public bool IsCharming(TargetMover t) => State == RivalState.Charming && target != null && target == t;
+
+    /// <summary>근처에서 벌어진 대결에 합류할 수 있는 상태인지 (기절/대결 중이 아님)</summary>
+    public bool CanJoinDuel =>
+        isActiveAndEnabled && stun != null && !stun.IsBusy &&
+        (State == RivalState.Wander || State == RivalState.Approach || State == RivalState.Charming);
 
     private TargetMover[] targets;
     private PlayerAttack player;
@@ -51,6 +61,18 @@ public class RivalAI : MonoBehaviour
     private float cooldownTimer;
     private float scanTimer;
     private float approachTimer;
+    private TargetMover stolenTarget;
+    private Vector2 exitPoint;
+    private float leaveTimer;
+    private float leaveSpeed;
+    private float leaveDeadline;
+
+    /// <summary>지금 퇴장하는 속도 (뺏긴 타겟이 따라올 때 사용)</summary>
+    public float CurrentLeaveSpeed => leaveSpeed;
+    private Vector3 spriteBaseLocalPos;
+
+    public bool IsLeaving => State == RivalState.Leaving;
+    public bool IsGone => State == RivalState.Gone;
 
     private Vector2 GuardCenter =>
         mode == RivalMode.Guard && guardTarget != null && guardTarget.IsAvailable
@@ -63,6 +85,7 @@ public class RivalAI : MonoBehaviour
         stun = GetComponent<StunController>();
         if (beam == null) beam = GetComponentInChildren<EyeBeam>(true);
         if (spriteRenderer == null) spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+        if (spriteRenderer != null) spriteBaseLocalPos = spriteRenderer.transform.localPosition;
     }
 
     private void Start()
@@ -80,6 +103,14 @@ public class RivalAI : MonoBehaviour
 
     private void Update()
     {
+        // 뺏은 타겟을 데리고 퇴장 중
+        if (State == RivalState.Leaving)
+        {
+            Leave();
+            return;
+        }
+        if (State == RivalState.Gone) return;
+
         // 튕겨 나가 기절 중
         if (stun.IsBusy)
         {
@@ -113,7 +144,8 @@ public class RivalAI : MonoBehaviour
         if (State == RivalState.Wander)
         {
             TryIntervene();
-            if (State == RivalState.Wander && mode == RivalMode.Hunter) TryHunt();
+            // 플레이어가 먼저 공격할 때만 움직이는 설정이면 혼자 사냥하지 않음
+            if (State == RivalState.Wander && mode == RivalMode.Hunter && !info.attackOnlyAfterPlayer) TryHunt();
         }
 
         switch (State)
@@ -182,6 +214,10 @@ public class RivalAI : MonoBehaviour
         State = RivalState.Approach;
     }
 
+    /// <summary>플레이어가 먼저 공격할 때만 움직이는 설정에서, 플레이어가 이 타겟에서 손을 뗐는지</summary>
+    private bool PlayerStoppedAttacking() =>
+        info.attackOnlyAfterPlayer && (player == null || player.CurrentTarget != target);
+
     private bool ValidTarget() => target != null && target.IsAvailable && target.ClaimingRival == this;
 
     private void GiveUp()
@@ -198,7 +234,7 @@ public class RivalAI : MonoBehaviour
 
     private void Approach()
     {
-        if (!ValidTarget())
+        if (!ValidTarget() || PlayerStoppedAttacking())
         {
             GiveUp();
             return;
@@ -223,7 +259,7 @@ public class RivalAI : MonoBehaviour
 
     private void Charm()
     {
-        if (!ValidTarget())
+        if (!ValidTarget() || PlayerStoppedAttacking())
         {
             GiveUp();
             return;
@@ -244,12 +280,10 @@ public class RivalAI : MonoBehaviour
         float amount = target.Info.maxLovePercent / Mathf.Max(0.1f, info.stealTime) * Time.deltaTime;
         if (target.AddRivalLove(amount, this))
         {
-            // 뺏기 성공 → 타겟은 이 라이벌을 따라다님
+            // 뺏기 성공 → 타겟을 데리고 화면 밖으로 퇴장
+            TargetMover stolen = target;
             target = null;
-            HideBeam();
-            State = RivalState.Wander;
-            cooldownTimer = RandomHuntCooldown();
-            PickNewDestination();
+            StartLeaving(stolen);
         }
     }
 
@@ -307,12 +341,14 @@ public class RivalAI : MonoBehaviour
 
     public void EnterDuel(TargetMover t)
     {
+        // 다른 타겟을 노리던 중이었다면 그 타겟은 놓아줌 (대결 합류)
+        if (target != null && target != t) target.ReleaseClaim(this);
         target = t;
         State = RivalState.Dueling;
         ShowBeam();
     }
 
-    /// <param name="rivalWon">true면 계속 눈빛을 쏴서 타겟을 뺏으려 함</param>
+    /// <param name="rivalWon">true면 계속 눈빛을 쏴서 타겟을 뺏으려 함 (타겟을 먼저 노리던 라이벌만)</param>
     public void ExitDuel(bool rivalWon)
     {
         if (rivalWon && target != null && target.IsAvailable)
@@ -330,6 +366,9 @@ public class RivalAI : MonoBehaviour
     /// <summary>새 게임 시작 시 초기화</summary>
     public void ResetRival()
     {
+        if (!gameObject.activeSelf) gameObject.SetActive(true); // 퇴장해서 꺼졌던 라이벌 복귀
+        stolenTarget = null;
+        if (spriteRenderer != null) spriteRenderer.transform.localPosition = spriteBaseLocalPos;
         stun.ResetState();
         ReleaseTarget();
         transform.position = new Vector3(originPos.x, originPos.y, transform.position.z);
@@ -339,6 +378,95 @@ public class RivalAI : MonoBehaviour
         cooldownTimer = InitialCooldown();
         PickNewDestination();
     }
+
+    #region 퇴장 (타겟을 뺏은 뒤)
+
+    /// <summary>
+    /// 뺏은 타겟을 데리고 화면 밖으로 터벅터벅 걸어나감.
+    /// duration을 주면 그 시간 안에 화면 밖에 도착하도록 속도를 맞춤 (플레이어가 멈춰 있는 동안).
+    /// </summary>
+    public void StartLeaving(TargetMover stolen, float duration = 0f)
+    {
+        ReleaseTarget();
+        stolenTarget = stolen;
+        exitPoint = ComputeExitPoint();
+        leaveTimer = 0f;
+
+        float dist = Vector2.Distance(transform.position, exitPoint);
+        if (duration > 0f)
+        {
+            leaveSpeed = Mathf.Max(info.leaveSpeed, dist / duration);
+            leaveDeadline = duration + 0.3f;
+        }
+        else
+        {
+            leaveSpeed = info.leaveSpeed;
+            leaveDeadline = info.leaveTimeout;
+        }
+        State = RivalState.Leaving;
+    }
+
+    private void Leave()
+    {
+        HideBeam();
+        leaveTimer += Time.deltaTime;
+        MoveTowards(exitPoint, leaveSpeed);
+
+        // 터벅터벅: 걸음마다 살짝 통통
+        if (spriteRenderer != null && spriteRenderer.transform != transform)
+        {
+            float bob = Mathf.Abs(Mathf.Sin(leaveTimer * walkBobSpeed)) * walkBobHeight;
+            spriteRenderer.transform.localPosition = spriteBaseLocalPos + new Vector3(0f, bob, 0f);
+        }
+
+        bool arrived = Vector2.Distance(transform.position, exitPoint) < 0.05f;
+        if (arrived || IsOutsideCamera(transform.position, info.leaveMargin) || leaveTimer > leaveDeadline)
+            Vanish();
+    }
+
+    private void Vanish()
+    {
+        State = RivalState.Gone;
+        if (spriteRenderer != null) spriteRenderer.transform.localPosition = spriteBaseLocalPos;
+        if (stolenTarget != null) stolenTarget.HideTaken();
+        stolenTarget = null;
+        gameObject.SetActive(false);
+    }
+
+    /// <summary>플레이어 반대쪽, 가까운 화면 옆쪽 가장자리 바깥 지점</summary>
+    private Vector2 ComputeExitPoint()
+    {
+        Vector2 pos = transform.position;
+        Vector2 dir = player != null ? pos - (Vector2)player.transform.position : Vector2.right;
+        if (dir.sqrMagnitude < 0.0001f) dir = Random.value < 0.5f ? Vector2.left : Vector2.right;
+        // 세로 화면이라 옆으로 나가는 게 가까움 → 가로 방향 위주로
+        dir = new Vector2(Mathf.Sign(dir.x == 0f ? 1f : dir.x), dir.normalized.y * 0.3f).normalized;
+
+        Camera cam = Camera.main;
+        if (cam == null || !cam.orthographic) return pos + dir * 15f;
+
+        float m = info.leaveMargin + 1f; // 캐릭터 몸 크기만큼 더 나가야 완전히 안 보임
+        float halfH = cam.orthographicSize + m;
+        float halfW = cam.orthographicSize * cam.aspect + m;
+        Vector2 c = cam.transform.position;
+
+        float tx = dir.x > 0f ? (c.x + halfW - pos.x) / dir.x : dir.x < 0f ? (c.x - halfW - pos.x) / dir.x : float.PositiveInfinity;
+        float ty = dir.y > 0f ? (c.y + halfH - pos.y) / dir.y : dir.y < 0f ? (c.y - halfH - pos.y) / dir.y : float.PositiveInfinity;
+        float t = Mathf.Max(0f, Mathf.Min(tx, ty));
+        return pos + dir * t;
+    }
+
+    private static bool IsOutsideCamera(Vector2 pos, float margin)
+    {
+        Camera cam = Camera.main;
+        if (cam == null || !cam.orthographic) return false;
+        float halfH = cam.orthographicSize + margin;
+        float halfW = cam.orthographicSize * cam.aspect + margin;
+        Vector2 c = cam.transform.position;
+        return pos.x < c.x - halfW || pos.x > c.x + halfW || pos.y < c.y - halfH || pos.y > c.y + halfH;
+    }
+
+    #endregion
 
     private void ReleaseTarget()
     {

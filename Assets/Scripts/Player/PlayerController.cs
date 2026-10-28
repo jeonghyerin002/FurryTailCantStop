@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -36,6 +37,10 @@ public class PlayerController : MonoBehaviour
     public bool IsRunning => isMoving && currentSpeed > info.WalkSpeed;
     /// <summary>피버 배율까지 적용된 실제 이동 속도</summary>
     public float CurrentSpeed => isMoving ? currentSpeed * FeverManager.MoveMultiplier : 0f;
+    public Vector2 Destination => destination;
+
+    /// <summary>빈 곳을 탭해서 이동을 시작할 때 (이동할 목적지). TouchMarker가 사용</summary>
+    public event Action<Vector2> OnTapMove;
 
     private void Awake()
     {
@@ -104,6 +109,7 @@ public class PlayerController : MonoBehaviour
         if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()) return;
 
         MoveTo(ScreenToWorld(screenPos));
+        OnTapMove?.Invoke(destination);
     }
 
     /// <summary>목적지 설정 + 거리에 따라 속도 결정</summary>

@@ -63,6 +63,11 @@ public class UIManager : MonoBehaviour
     [SerializeField] private string captiveFormat = "x {0}";
 
     public bool IsPlaying { get; private set; }
+
+    /// <summary>시작 버튼을 눌러 타이머가 시작될 때 (SoundManager가 브금 재생)</summary>
+    public event Action OnGameStarted;
+    /// <summary>타이머가 끝났을 때 (SoundManager가 종료 사운드 재생)</summary>
+    public event Action OnGameEnded;
     public float RemainingTime { get; private set; }
 
     private TargetMover[] targets;
@@ -143,6 +148,7 @@ public class UIManager : MonoBehaviour
             if (player.TryGetComponent(out PlayerAttack attack)) attack.CancelAttack();
             if (player.TryGetComponent(out PlayerController controller)) controller.ResetToStart();
         }
+        if (CameraManager.Instance != null) CameraManager.Instance.SnapToTarget(); // 카메라도 바로 플레이어 위치로
 
         // 타이머 시작
         RemainingTime = gameDuration;
@@ -155,6 +161,7 @@ public class UIManager : MonoBehaviour
         Time.timeScale = 1f;
         IsPlaying = true;
         if (player != null) player.SetPlaying(true);
+        OnGameStarted?.Invoke();
     }
 
     private void EndGame()
@@ -164,6 +171,7 @@ public class UIManager : MonoBehaviour
         if (player != null && player.TryGetComponent(out PlayerAttack attack)) attack.CancelAttack();
 
         if (ScoreManager.Instance != null) lastGameWasNewBest = ScoreManager.Instance.SaveScore();
+        OnGameEnded?.Invoke();
         ShowStartScreen();
     }
 
