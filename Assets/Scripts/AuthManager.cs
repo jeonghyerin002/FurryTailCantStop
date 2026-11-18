@@ -10,7 +10,7 @@ public class AuthManager : MonoBehaviour
     public TMP_Text statusText;                                    // Login 씬의 상태 글자
     public static string Uid = "", IdToken = "", Name = "";         // static: 씬이 바뀌어도 남음
 
-    public void GuestLogin() { statusText.text = "로그인 중..."; StartCoroutine(SignIn()); }   // 게스트 로그인 버튼
+    public void GuestLogin() { statusText.text = "Login..."; StartCoroutine(SignIn()); }   // 게스트 로그인 버튼
     public static void Logout() { Uid = ""; IdToken = ""; Name = ""; SceneManager.LoadScene("Login"); }
     IEnumerator SignIn()
     {
@@ -25,7 +25,7 @@ public class AuthManager : MonoBehaviour
         AuthResponse r = JsonUtility.FromJson<AuthResponse>(req.downloadHandler.text);
         Uid = saved == "" ? r.localId : r.user_id; IdToken = saved == "" ? r.idToken : r.id_token;
         PlayerPrefs.SetString("refreshToken", saved == "" ? r.refreshToken : r.refresh_token); PlayerPrefs.Save();
-        Name = "손님 " + Uid.Substring(0, 6); SceneManager.LoadScene("Menu");   // 로그인 끝 → Menu 씬으로
+        Name = "Guest " + Uid.Substring(0, 6); SceneManager.LoadScene("Menu");   // 로그인 끝 → Menu 씬으로
     }
 }
 [System.Serializable] public class AuthResponse { public string idToken, localId, refreshToken, id_token, user_id, refresh_token; }
