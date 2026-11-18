@@ -1,4 +1,5 @@
 using System;
+using NUnit.Framework.Internal;
 using UnityEngine;
 
 /// <summary>
@@ -61,6 +62,8 @@ public class ScoreManager : MonoBehaviour
             BestScore = CurrentScore;
             PlayerPrefs.SetInt(BestScoreKey, BestScore);
             OnBestScoreChanged?.Invoke(BestScore);
+
+            ScoreSaver.Instance.Save(BestScore);
         }
 
         PlayerPrefs.Save();
