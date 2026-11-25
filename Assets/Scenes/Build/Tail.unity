@@ -349,6 +349,65 @@ MonoBehaviour:
   autoFindFeet: 1
   offsetY: 0.05
   offsetX: 0
+--- !u!1 &33507171
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 33507173}
+  - component: {fileID: 33507172}
+  m_Layer: 0
+  m_Name: DummyAds
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &33507172
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 33507171}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7347fe815b151364b80fa9264ee6849d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DummyAds
+  networks:
+  - name: Network A
+    eCPM: 10
+    fillRate: 0.5
+  - name: Network B
+    eCPM: 9
+    fillRate: 0.6
+  - name: Network C
+    eCPM: 7
+    fillRate: 0.8
+  useBidding: 0
+  noFill: 0
+  askSeconds: 0.5
+  interstitialSeconds: 3
+  rewardedSeconds: 5
+--- !u!4 &33507173
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 33507171}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 42.79623, y: 194.2547, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &61374573
 GameObject:
   m_ObjectHideFlags: 0
@@ -11752,7 +11811,7 @@ MonoBehaviour:
   timerText: {fileID: 846897605}
   inGameScoreText: {fileID: 1426066481}
   captiveText: {fileID: 0}
-  gameDuration: 90
+  gameDuration: 10
   gradeRules:
   - grade: S
     minScore: 200
@@ -12626,3 +12685,4 @@ SceneRoots:
   - {fileID: 1309880862}
   - {fileID: 1138438686}
   - {fileID: 656568048}
+  - {fileID: 33507173}
